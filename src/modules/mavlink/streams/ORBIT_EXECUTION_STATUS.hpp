@@ -55,28 +55,32 @@ public:
 private:
 	explicit MavlinkStreamOrbitStatus(Mavlink *mavlink) : MavlinkStream(mavlink) {}
 
-	uORB::Subscription _orbit_status_sub{ORB_ID(orbit_status)};
+	uORB::SubscriptionMultiArray<orbit_status_s> _orbit_status_sub{ORB_ID::orbit_status};
 
 	bool send() override
 	{
-		orbit_status_s orbit_status;
+		orbit_status_s _orbit_status;
 
-		if (_orbit_status_sub.update(&orbit_status)) {
-			mavlink_orbit_execution_status_t msg{};
+		for (auto &orbit_sub : _orbit_status_sub) {
 
-			msg.time_usec = orbit_status.timestamp;
-			msg.radius = orbit_status.radius;
-			msg.frame = orbit_status.frame;
-			msg.x = orbit_status.x * 1e7;
-			msg.y = orbit_status.y * 1e7;
-			msg.z = orbit_status.z;
+			if (orbit_sub.update(&_orbit_status)) {
+				mavlink_orbit_execution_status_t _msg_orbit_execution_status{};
 
-			mavlink_msg_orbit_execution_status_send_struct(_mavlink->get_channel(), &msg);
+				_msg_orbit_execution_status.time_usec = _orbit_status.timestamp;
+				_msg_orbit_execution_status.radius = _orbit_status.radius;
+				_msg_orbit_execution_status.frame = _orbit_status.frame;
+				_msg_orbit_execution_status.x = _orbit_status.x * 1e7;
+				_msg_orbit_execution_status.y = _orbit_status.y * 1e7;
+				_msg_orbit_execution_status.z = _orbit_status.z;
 
-			return true;
+				mavlink_msg_orbit_execution_status_send_struct(_mavlink->get_channel(), &_msg_orbit_execution_status);
+
+				// only one subscription should ever be active at any time, so we can exit here
+				break;
+			}
 		}
 
-		return false;
+		return true;
 	}
 };
 
