@@ -2731,7 +2731,8 @@ Commander::run()
 						       static_cast<offboard_loss_rc_actions_t>(_param_com_obl_rc_act.get()),
 						       static_cast<position_nav_loss_actions_t>(_param_com_posctl_navl.get()),
 						       _param_com_rcl_act_t.get(),
-						       _param_com_rcl_except.get());
+						       _param_com_rcl_except.get(),
+						       _param_gps_fail_openloop_loiter_time.get());
 
 		if (nav_state_changed) {
 			_status.nav_state_timestamp = hrt_absolute_time();
@@ -3289,8 +3290,8 @@ Commander::update_control_mode()
 		_vehicle_control_mode.flag_control_attitude_enabled = true;
 		_vehicle_control_mode.flag_control_altitude_enabled = true;
 		_vehicle_control_mode.flag_control_climb_rate_enabled = true;
-		_vehicle_control_mode.flag_control_position_enabled = !_status.in_transition_mode;
-		_vehicle_control_mode.flag_control_velocity_enabled = !_status.in_transition_mode;
+		_vehicle_control_mode.flag_control_position_enabled = true;
+		_vehicle_control_mode.flag_control_velocity_enabled = true;
 		break;
 
 	case vehicle_status_s::NAVIGATION_STATE_AUTO_RTL:
@@ -3306,8 +3307,15 @@ Commander::update_control_mode()
 		_vehicle_control_mode.flag_control_attitude_enabled = true;
 		_vehicle_control_mode.flag_control_altitude_enabled = true;
 		_vehicle_control_mode.flag_control_climb_rate_enabled = true;
-		_vehicle_control_mode.flag_control_position_enabled = !_status.in_transition_mode;
-		_vehicle_control_mode.flag_control_velocity_enabled = !_status.in_transition_mode;
+		_vehicle_control_mode.flag_control_position_enabled = true;
+		_vehicle_control_mode.flag_control_velocity_enabled = true;
+		break;
+
+	case vehicle_status_s::NAVIGATION_STATE_FIXED_BANK_LOITER:
+		_vehicle_control_mode.flag_control_rates_enabled = true;
+		_vehicle_control_mode.flag_control_attitude_enabled = true;
+		_vehicle_control_mode.flag_control_altitude_enabled = true;
+		_vehicle_control_mode.flag_control_climb_rate_enabled = true;
 		break;
 
 	case vehicle_status_s::NAVIGATION_STATE_AUTO_LANDGPSFAIL:

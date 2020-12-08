@@ -825,3 +825,17 @@ PARAM_DEFINE_FLOAT(FW_T_CLMB_R_SP, 3.0f);
  * @group FW TECS
  */
 PARAM_DEFINE_FLOAT(FW_T_SINK_R_SP, 2.0f);
+
+/**
+ * GPS failure roll angle
+ *
+ * Roll in degrees during the loiter after the vehicle has lost GPS in an auto mode (e.g. mission or loiter)
+ *
+ * @unit deg
+ * @min -45.0
+ * @max 45.0
+ * @decimal 1
+ * @increment 0.5
+ * @group FW L1 Control
+ */
+PARAM_DEFINE_FLOAT(FW_GPSF_R, 15.0f);
