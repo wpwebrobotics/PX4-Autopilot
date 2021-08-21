@@ -85,52 +85,58 @@ if(EXISTS ${BOARD_DEFCONFIG})
         if(Drivers)
             # Find the value
             string(REPLACE "${Name}=" "" Value ${NameAndValue})
-            string(REPLACE "CONFIG_DRIVERS_" "" driver ${Name})
-            string(TOLOWER ${driver} driver)
 
-            string(REPLACE "_" "/" driver_path ${driver})
+            if(${Value} STREQUAL "y")
 
-            # Pattern 1 XXX / XXX_XXX
-            string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+_[a-z0-9]+).*$" "\\1" driver_p1_folder ${driver})
-            string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+_[a-z0-9]+).*$" "\\2" driver_p1_subfolder ${driver})
+                string(REPLACE "CONFIG_DRIVERS_" "" driver ${Name})
+                string(TOLOWER ${driver} driver)
 
-            # Pattern 2 XXX_XXX / XXXXXX
-            string(REGEX REPLACE "(^[a-z]+_[a-z0-9]+)_([a-z0-9]+).*$" "\\1" driver_p2_folder ${driver})
-            string(REGEX REPLACE "(^[a-z]+_[a-z0-9]+)_([a-z0-9]+).*$" "\\2" driver_p2_subfolder ${driver})
+                string(REPLACE "_" "/" driver_path ${driver})
 
-            # Pattern 3 XXXXXX / XXX_XXX / XXXXXX
-            string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+_[a-z0-9]+)_([a-z]+[a-z0-9]+).*$" "\\1" driver_p3_folder ${driver})
-            string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+_[a-z0-9]+)_([a-z]+[a-z0-9]+).*$" "\\2" driver_p3_subfolder ${driver})
-            string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+_[a-z0-9]+)_([a-z]+[a-z0-9]+).*$" "\\3" driver_p3_subsubfolder ${driver})
 
-            # Pattern 4 XXX_XXX / XXX_XXX_XXX
-            string(REGEX REPLACE "(^[a-z]+_[a-z0-9]+)_([a-z_0-9]+).*$" "\\1" driver_p4_folder ${driver})
-            string(REGEX REPLACE "(^[a-z]+_[a-z0-9]+)_([a-z_0-9]+).*$" "\\2" driver_p4_subfolder ${driver})
+                #message(STATUS "driver: ${driver} ${driver_path}")
 
-            # Pattern 5 XXXXXX / XXXXXX / XXX_XXX
-            string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+[a-z0-9]+)_([a-z0-9]+_[a-z0-9]+).*$" "\\1" driver_p5_folder ${driver})
-            string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+[a-z0-9]+)_([a-z0-9]+_[a-z0-9]+).*$" "\\2" driver_p5_subfolder ${driver})
-            string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+[a-z0-9]+)_([a-z0-9]+_[a-z0-9]+).*$" "\\3" driver_p5_subsubfolder ${driver})
+                # Pattern 1 XXX / XXX_XXX
+                string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+_[a-z0-9]+).*$" "\\1" driver_p1_folder ${driver})
+                string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+_[a-z0-9]+).*$" "\\2" driver_p1_subfolder ${driver})
 
-            # Trick circumvent PX4 src naming problem with underscores and slashes
-            if(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver})
-                list(APPEND config_module_list drivers/${driver})
-            elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_path})
-                list(APPEND config_module_list drivers/${driver_path})
-            elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_p3_folder}/${driver_p3_subfolder}/${driver_p3_subsubfolder})
-                list(APPEND config_module_list drivers/${driver_p3_folder}/${driver_p3_subfolder}/${driver_p3_subsubfolder})
-            elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_p1_folder}/${driver_p1_subfolder})
-                list(APPEND config_module_list drivers/${driver_p1_folder}/${driver_p1_subfolder})
-            elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_p4_folder}/${driver_p4_subfolder})
-                list(APPEND config_module_list drivers/${driver_p4_folder}/${driver_p4_subfolder})
-            elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_p2_folder}/${driver_p2_subfolder})
-                list(APPEND config_module_list drivers/${driver_p2_folder}/${driver_p2_subfolder})
-            elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_p5_folder}/${driver_p5_subfolder}/${driver_p5_subsubfolder})
-                list(APPEND config_module_list drivers/${driver_p5_folder}/${driver_p5_subfolder}/${driver_p5_subsubfolder})
-            else()
-                message(FATAL_ERROR "Couldn't find path for ${driver}")
+                # Pattern 2 XXX_XXX / XXXXXX
+                string(REGEX REPLACE "(^[a-z]+_[a-z0-9]+)_([a-z0-9]+).*$" "\\1" driver_p2_folder ${driver})
+                string(REGEX REPLACE "(^[a-z]+_[a-z0-9]+)_([a-z0-9]+).*$" "\\2" driver_p2_subfolder ${driver})
+
+                # Pattern 3 XXXXXX / XXX_XXX / XXXXXX
+                string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+_[a-z0-9]+)_([a-z]+[a-z0-9]+).*$" "\\1" driver_p3_folder ${driver})
+                string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+_[a-z0-9]+)_([a-z]+[a-z0-9]+).*$" "\\2" driver_p3_subfolder ${driver})
+                string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+_[a-z0-9]+)_([a-z]+[a-z0-9]+).*$" "\\3" driver_p3_subsubfolder ${driver})
+
+                # Pattern 4 XXX_XXX / XXX_XXX_XXX
+                string(REGEX REPLACE "(^[a-z]+_[a-z0-9]+)_([a-z_0-9]+).*$" "\\1" driver_p4_folder ${driver})
+                string(REGEX REPLACE "(^[a-z]+_[a-z0-9]+)_([a-z_0-9]+).*$" "\\2" driver_p4_subfolder ${driver})
+
+                # Pattern 5 XXXXXX / XXXXXX / XXX_XXX
+                string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+[a-z0-9]+)_([a-z0-9]+_[a-z0-9]+).*$" "\\1" driver_p5_folder ${driver})
+                string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+[a-z0-9]+)_([a-z0-9]+_[a-z0-9]+).*$" "\\2" driver_p5_subfolder ${driver})
+                string(REGEX REPLACE "(^[a-z]+)_([a-z0-9]+[a-z0-9]+)_([a-z0-9]+_[a-z0-9]+).*$" "\\3" driver_p5_subsubfolder ${driver})
+
+                # Trick circumvent PX4 src naming problem with underscores and slashes
+                if(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver})
+                    list(APPEND config_module_list drivers/${driver})
+                elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_path})
+                    list(APPEND config_module_list drivers/${driver_path})
+                elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_p3_folder}/${driver_p3_subfolder}/${driver_p3_subsubfolder})
+                    list(APPEND config_module_list drivers/${driver_p3_folder}/${driver_p3_subfolder}/${driver_p3_subsubfolder})
+                elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_p1_folder}/${driver_p1_subfolder})
+                    list(APPEND config_module_list drivers/${driver_p1_folder}/${driver_p1_subfolder})
+                elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_p4_folder}/${driver_p4_subfolder})
+                    list(APPEND config_module_list drivers/${driver_p4_folder}/${driver_p4_subfolder})
+                elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_p2_folder}/${driver_p2_subfolder})
+                    list(APPEND config_module_list drivers/${driver_p2_folder}/${driver_p2_subfolder})
+                elseif(EXISTS ${PX4_SOURCE_DIR}/src/drivers/${driver_p5_folder}/${driver_p5_subfolder}/${driver_p5_subsubfolder})
+                    list(APPEND config_module_list drivers/${driver_p5_folder}/${driver_p5_subfolder}/${driver_p5_subsubfolder})
+                else()
+                    message(WARNING "Couldn't find path for ${driver}")
+                endif()
             endif()
-
         endif()
 
         # Find variable name
@@ -248,15 +254,6 @@ if(EXISTS ${BOARD_DEFCONFIG})
 	# ROMFS
 	if(ROMFSROOT)
 		set(config_romfs_root ${ROMFSROOT} CACHE INTERNAL "ROMFS root" FORCE)
-
-		if(BUILD_BOOTLOADER)
-			set(config_build_bootloader "1" CACHE INTERNAL "build bootloader" FORCE)
-		endif()
-
-		# IO board (placed in ROMFS)
-		if(IO)
-			set(config_io_board ${IO} CACHE INTERNAL "IO" FORCE)
-		endif()
 
 		if(UAVCAN_PERIPHERALS)
 			set(config_uavcan_peripheral_firmware ${UAVCAN_PERIPHERALS} CACHE INTERNAL "UAVCAN peripheral firmware" FORCE)
