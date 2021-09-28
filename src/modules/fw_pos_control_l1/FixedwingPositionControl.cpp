@@ -1192,10 +1192,13 @@ FixedwingPositionControl::control_position(const hrt_abstime &now, const Vector2
 		_att_sp.yaw_body = 0.f;
 
 	} else if (_control_mode.flag_control_climb_rate_enabled && !_control_mode.flag_control_altitude_enabled) {
-		/* DESCEND mode, without position and altitude control, just descend rate is controlled.
-		   Descend rate is st to FW_T_SINK_MIN. */
+		// DESCEND mode, without position and altitude control, just descend rate is controlled
 
 		_control_mode_current = FW_POSCTRL_MODE_CLIMBRATE;
+
+		// Hard-code descend rate to 0.5m/s. This is a compromise to give the system to recover,
+		// but not letting it drift too far away.
+		const float descend_rate = -0.5f;
 
 		tecs_update_pitch_throttle(now, _hold_alt,
 					   _param_fw_airspd_trim.get(),
@@ -1207,7 +1210,7 @@ FixedwingPositionControl::control_position(const hrt_abstime &now, const Vector2
 					   false,
 					   _param_fw_p_lim_min.get(),
 					   tecs_status_s::TECS_MODE_NORMAL,
-					   -_param_fw_t_sink_min.get());
+					   descend_rate);
 
 		_att_sp.roll_body = math::radians(_param_nav_gpsf_r.get()); // open loop loiter bank angle
 		_att_sp.yaw_body = 0.f;
