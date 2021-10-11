@@ -31,10 +31,14 @@
 #
 ############################################################################
 
+add_compile_options(-Wno-error)
+
 px4_add_library(vehicle_magnetometer
 	VehicleMagnetometer.cpp
 	VehicleMagnetometer.hpp
 )
+
+
 
 target_link_libraries(vehicle_magnetometer
 	PRIVATE
